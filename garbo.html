@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Garbo &middot; Her Life</title>
+<meta name="theme-color" content="#0a0a0b">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* The creative board's ground and type. One small grid runs through her
+     life in date order; the timeline above it is the map. */
+  :root{
+    --ink:#0a0a0b;
+    --paper:#eae7e1;
+    --dim:rgba(234,231,225,.5);
+    --faint:rgba(234,231,225,.26);
+    --hair:rgba(234,231,225,.13);
+    --plate:#141417;
+    --gap:4px;
+    --cell:96px;
+    --pad:clamp(16px,3vw,44px);
+    --sans:"Inter",-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;color:var(--paper);background:var(--ink);overflow-x:hidden;font-family:var(--sans);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-transform:inherit;letter-spacing:inherit}
+  .label{font-size:9.5px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--dim)}
+  a.label{text-decoration:none;transition:color .3s}
+  a.label:hover{color:var(--paper)}
+  body::before{content:"";position:fixed;inset:-50%;z-index:90;pointer-events:none;opacity:.06;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation:grain 1.2s steps(6) infinite}
+  @keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-3%,2%)}40%{transform:translate(2%,-3%)}60%{transform:translate(-2%,-1%)}80%{transform:translate(3%,3%)}100%{transform:translate(0,0)}}
+  @media (prefers-reduced-motion:reduce){ body::before{animation:none} }
+
+  .cover{padding:clamp(18px,3vh,28px) var(--pad) clamp(18px,3vh,26px)}
+  .topline{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .cover h1{margin:clamp(24px,4vh,40px) 0 4px;font:500 clamp(17px,1.4vw,21px)/1.25 var(--sans);letter-spacing:.26em;text-transform:uppercase}
+
+  /* ---------- the sticky bar: timeline + controls ---------- */
+  .bar{position:sticky;top:0;z-index:40;background:rgba(10,10,11,.9);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);padding:10px var(--pad) 8px}
+  .ctrl{display:flex;align-items:baseline;gap:22px;flex-wrap:wrap}
+  .group{display:flex;align-items:baseline;gap:14px}
+  .ctrl button{transition:color .3s}
+  .ctrl button:hover,.ctrl button.on{color:var(--paper)}
+  .sep{width:1px;height:11px;background:var(--hair);align-self:center}
+  .spacer{flex:1}
+  #now{color:var(--paper);min-width:5.5em}
+
+  #timeline{position:relative;margin-top:10px;height:46px;cursor:pointer;user-select:none;-webkit-user-select:none}
+  #timeline .eras{position:absolute;left:0;right:0;top:0;height:12px}
+  #timeline .era{position:absolute;top:0;font-size:8.5px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:5px;border-left:1px solid var(--hair);height:12px;line-height:12px}
+  #timeline .bars{position:absolute;left:0;right:0;top:16px;height:18px;display:flex;align-items:flex-end;gap:1px}
+  #timeline .bars i{flex:1 1 0;min-width:0;background:rgba(234,231,225,.32);transition:background .2s}
+  #timeline .bars i.empty{background:rgba(234,231,225,.05);height:2px!important}
+  #timeline .bars i:hover{background:var(--paper)}
+  #timeline .bars i.cur{background:var(--paper)}
+  #timeline .years{position:absolute;left:0;right:0;top:36px;height:10px}
+  #timeline .years span{position:absolute;transform:translateX(-50%);font-size:8.5px;letter-spacing:.08em;color:var(--faint)}
+  #tip{position:absolute;top:-2px;transform:translate(-50%,-100%);background:var(--paper);color:var(--ink);font-size:9.5px;font-weight:500;letter-spacing:.14em;padding:3px 7px;border-radius:2px;pointer-events:none;display:none;white-space:nowrap}
+
+  /* ---------- the life ---------- */
+  main{padding:8px var(--pad) 140px}
+  .era-h{margin:44px 0 6px;padding-top:12px;border-top:2px solid var(--paper);display:flex;justify-content:space-between;align-items:baseline}
+  .era-h:first-child{margin-top:18px}
+  .era-h h2{margin:0;font:500 13px/1.3 var(--sans);letter-spacing:.24em;text-transform:uppercase}
+  .year{display:grid;grid-template-columns:64px minmax(0,1fr);gap:12px;padding:10px 0;border-top:1px solid var(--hair);scroll-margin-top:120px}
+  .year .y{font:500 13px/1 var(--sans);letter-spacing:.12em;padding-top:4px}
+  .year .y small{display:block;margin-top:6px;font-size:9px;letter-spacing:.2em;color:var(--faint);font-weight:500}
+  .cells{display:grid;gap:var(--gap);grid-template-columns:repeat(auto-fill,minmax(var(--cell),1fr))}
+  /* a film's title runs across the top of its stills, never squeezed into the year column */
+  .year.film{grid-template-columns:1fr;gap:8px}
+  .film-h{font:500 11px/1.4 var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--paper)}
+  .film-h small{display:inline!important;margin:0 0 0 12px!important}
+
+  .tile{position:relative;aspect-ratio:1;background:var(--plate);overflow:hidden;cursor:zoom-in}
+  body.fit .tile img,body.fit .tile video{object-fit:contain}
+  .tile img,.tile video{display:block;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s ease;pointer-events:none}
+  .tile .in{opacity:1}
+  .tile::after{content:"";position:absolute;inset:0;pointer-events:none;outline:1px solid transparent;outline-offset:-1px;transition:outline-color .25s}
+  @media (hover:hover){ .tile:hover::after{outline-color:rgba(234,231,225,.5)} }
+  .tile .mv{position:absolute;right:5px;bottom:5px;width:5px;height:5px;border-radius:50%;background:rgba(234,231,225,.8);box-shadow:0 0 4px rgba(0,0,0,.6);pointer-events:none}
+  .tile .hide{position:absolute;right:0;top:0;padding:5px 6px;font-size:8.5px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:rgba(234,231,225,.85);background:linear-gradient(225deg,rgba(0,0,0,.55),transparent 70%);opacity:0;transition:opacity .2s}
+  .tile:hover .hide{opacity:1}
+  .tile .hide:hover{color:#fff}
+  .tile.gone img,.tile.gone video{opacity:.25}
+  .tile[draggable="true"]{cursor:grab}
+  .tile.dragging{opacity:.25}
+  .tile.landed::after{animation:flash 1.6s ease}
+  @keyframes flash{0%,40%{outline:2px solid var(--paper);outline-offset:-2px}100%{outline-color:transparent}}
+  #caret{position:fixed;width:2px;background:var(--paper);pointer-events:none;z-index:30;display:none;box-shadow:0 0 12px rgba(234,231,225,.5)}
+  @media (hover:none){ .tile .hide{opacity:1} }
+
+  #toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,calc(100% + 40px));z-index:80;display:flex;gap:18px;align-items:center;padding:12px 20px;background:var(--paper);color:var(--ink);border-radius:999px;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+  #toast.on{transform:translate(-50%,0)}
+  #toast .label{color:var(--ink)}
+  #toast button{text-decoration:underline;text-underline-offset:3px}
+
+  /* ---------- viewer ---------- */
+  #lb{position:fixed;inset:0;z-index:100;background:rgba(6,6,7,.975);display:none;place-items:center}
+  #lb.on{display:grid}
+  #lb img,#lb video{max-width:88vw;max-height:76vh;object-fit:contain}
+  #lb .cap{position:fixed;left:0;right:0;bottom:20px;text-align:center;padding:0 24px}
+  #lb .cap .t{font:500 11px/1.5 var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--paper)}
+  #lb .cap .d{font-size:12.5px;color:var(--dim);max-width:60em;margin:4px auto 0}
+  #lb .cap .m{margin-top:8px;display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+  #lb .cap a{color:var(--dim)}
+  #lb .cap a:hover{color:var(--paper)}
+  #lb .x{position:fixed;top:18px;right:max(20px,3vw);padding:8px}
+  #lb .x:hover{color:var(--paper)}
+  #lb .nav{position:fixed;top:60px;bottom:110px;width:24vw}
+  #lb .nav.p{left:0;cursor:w-resize}
+  #lb .nav.n{right:0;cursor:e-resize}
+  kbd{font:inherit;color:var(--faint);margin-left:6px}
+
+  /* the public copy: look, don't touch */
+  html.view #update,html.view #hiddenBtn,html.view .tile .hide,html.view #toast{display:none!important}
+  html.view .tile{cursor:zoom-in!important}
+
+  @media (max-width:760px){
+    :root{--cell:72px}
+    .year{grid-template-columns:1fr;gap:6px}
+    .year .y small{display:inline;margin-left:8px}
+    #timeline .era{display:none}
+    kbd{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="cover">
+  <div class="topline">
+    <span class="label">Greta Garbo &nbsp;·&nbsp; Her Life &nbsp;·&nbsp; Cara Stricker</span>
+    <span class="label"><a class="label" href="https://animazephyr.github.io/garbo-boards/">← Creative board</a> &nbsp;&nbsp; <a class="label" href="https://animazephyr.github.io/garbo-boards/approach.html">Approach →</a></span>
+  </div>
+  <h1>Garbo</h1>
+  <div class="label" id="count"></div>
+</header>
+
+<div class="bar label">
+  <div class="ctrl">
+    <span id="now"></span>
+    <span class="sep"></span>
+    <div class="group" id="kinds">
+      <button data-kind="all" class="on">All</button>
+      <button data-kind="image">Photographs</button>
+      <button data-kind="video">Moving</button>
+    </div>
+    <span class="sep"></span>
+    <div class="group">
+      <button data-size="s" class="on">S</button>
+      <button data-size="m">M</button>
+      <button data-size="l">L</button>
+    </div>
+    <span class="sep"></span>
+    <button id="fit">Whole picture</button>
+    <span class="spacer"></span>
+    <button id="update" title="Add what has arrived in the research folders since">Update</button>
+    <button id="hiddenBtn">Archive</button>
+  </div>
+  <div id="timeline" title="Jump through her life">
+    <div class="eras" id="eras"></div>
+    <div class="bars" id="bars"></div>
+    <div class="years" id="years"></div>
+    <div id="tip"></div>
+  </div>
+</div>
+
+<main id="life"></main>
+<div id="caret"></div>
+<div id="toast"><span class="label" id="toastMsg"></span><button class="label" id="toastUndo">Undo</button></div>
+
+<div id="lb" role="dialog" aria-modal="true" aria-label="Viewer">
+  <button class="nav p" aria-label="Previous"></button>
+  <img alt="">
+  <video muted loop playsinline autoplay controls hidden></video>
+  <button class="nav n" aria-label="Next"></button>
+  <button class="x label" aria-label="Close">Close<kbd>esc</kbd></button>
+  <div class="cap"><div class="t" id="lbt"></div><div class="d" id="lbd"></div><div class="m label" id="lbm"></div></div>
+</div>
+
+<script src="view.js?v=bd6e9074"></script>
+<script>if (window.GARBO_VIEW) document.documentElement.classList.add("view");</script>
+<script src="life.js?v=e0a6e2ef"></script>
+<script src="garbo.js?v=cfc320ac"></script>
+</body>
+</html>
