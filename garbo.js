@@ -26,6 +26,7 @@
   var prefs = { size: "s", kind: "all", fit: false };
   try { prefs = Object.assign(prefs, JSON.parse(localStorage.getItem(PREFS)) || {}); } catch (e) {}
   if (["all", "image", "video"].indexOf(prefs.kind) < 0) prefs.kind = "all";
+  prefs.fit = true;   // the page always opens on whole pictures, uncropped
   var showHidden = false;
   var life = document.getElementById("life");
   var shown = [];     // ids on the page, in order, for the viewer
